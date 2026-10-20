@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Auralis AI</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 20% 10%,
+            #392b72 0%,
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 80% 90%,
+            #173b52 0%,
+            transparent 35%
+        ),
+        #07070b;
+
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 30px;
+}
+
+.container {
+    width: min(900px, 100%);
+
+    background: rgba(20, 20, 28, 0.75);
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    border-radius: 28px;
+
+    padding: 42px;
+
+    backdrop-filter: blur(25px);
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.5);
+}
+
+.logo {
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+
+    opacity: .6;
+
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: clamp(42px, 7vw, 76px);
+
+    line-height: .95;
+
+    margin: 0 0 15px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #fff,
+            #a78bfa,
+            #67e8f9
+        );
+
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.subtitle {
+    color: #a1a1aa;
+
+    margin-bottom: 40px;
+
+    font-size: 17px;
+}
+
+textarea {
+    width: 100%;
+
+    min-height: 130px;
+
+    resize: vertical;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    background: rgba(255,255,255,.04);
+
+    color: white;
+
+    outline: none;
+
+    font-size: 16px;
+
+    transition: .2s;
+}
+
+textarea:focus {
+    border-color: #8b5cf6;
+
+    box-shadow:
+        0 0 30px rgba(139,92,246,.15);
+}
+
+.controls {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 15px;
+
+    margin-top: 18px;
+}
+
+.control {
+    background: rgba(255,255,255,.04);
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    border-radius: 16px;
+
+    padding: 15px;
+}
+
+label {
+    display: block;
+
+    color: #aaa;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+
+    background: transparent;
+
+    border: none;
+
+    color: white;
+
+    outline: none;
+
+    font-size: 18px;
+}
+
+button {
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding: 18px;
+
+    border: none;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7c3aed,
+            #06b6d4
+        );
+
+    color: white;
+
+    font-weight: 700;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s,
+        box-shadow .2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 15px 35px rgba(124,58,237,.3);
+}
+
+button:disabled {
+    opacity: .5;
+
+    cursor: wait;
+
+    transform: none;
+}
+
+.status {
+    margin-top: 25px;
+
+    color: #a1a1aa;
+
+    text-align: center;
+}
+
+.player {
+    display: none;
+
+    margin-top: 25px;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    background: rgba(255,255,255,.04);
+}
+
+audio {
+    width: 100%;
+}
+
+.download {
+    display: block;
+
+    margin-top: 12px;
+
+    color: #67e8f9;
+
+    text-align: center;
+
+    text-decoration: none;
+}
+
+@media(max-width:600px) {
+
+    .container {
+        padding: 25px;
+    }
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        Auralis AI
+    </div>
+
+    <h1>
+        Create sound.
+    </h1>
+
+    <div class="subtitle">
+        Describe a song. Let AI turn the idea into music.
+    </div>
+
+    <textarea
+        id="prompt"
+        placeholder="Example: dreamy alternative R&B with warm analog synths, soft drums, emotional guitar melodies, atmospheric vocals..."
+    ></textarea>
+
+    <div class="controls">
+
+        <div class="control">
+
+            <label>
+                Duration
+            </label>
+
+            <input
+                id="duration"
+                type="number"
+                value="10"
+                min="1"
+                max="30"
+            >
+
+        </div>
+
+        <div class="control">
+
+            <label>
+                Temperature
+            </label>
+
+            <input
+                id="temperature"
+                type="number"
+                value="1.0"
+                min=".1"
+                max="2"
+                step=".1"
+            >
+
+        </div>
+
+    </div>
+
+    <button
+        id="generate"
+        onclick="generateMusic()"
+    >
+        Generate Music
+    </button>
+
+    <div
+        class="status"
+        id="status"
+    >
+        Ready.
+    </div>
+
+    <div
+        class="player"
+        id="player"
+    >
+
+        <audio
+            id="audio"
+            controls
+        ></audio>
+
+        <a
+            id="download"
+            class="download"
+            download
+        >
+            Download WAV
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function generateMusic() {
+
+    const prompt =
+        document.getElementById("prompt").value;
+
+    const duration =
+        Number(
+            document.getElementById("duration").value
+        );
+
+    const temperature =
+        Number(
+            document.getElementById("temperature").value
+        );
+
+    const button =
+        document.getElementById("generate");
+
+    const status =
+        document.getElementById("status");
+
+    const player =
+        document.getElementById("player");
+
+    if (!prompt.trim()) {
+
+        status.innerText =
+            "Describe the music you want first.";
+
+        return;
+
+    }
+
+    button.disabled = true;
+
+    player.style.display = "none";
+
+    status.innerText =
+        "Generating your track...";
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/generate",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        prompt,
+                        duration,
+                        temperature
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail ||
+                "Generation failed."
+            );
+        }
+
+        const audio =
+            document.getElementById("audio");
+
+        const download =
+            document.getElementById("download");
+
+        audio.src = data.url;
+
+        download.href = data.url;
+
+        player.style.display = "block";
+
+        status.innerText =
+            "Your track is ready.";
+
+        audio.play();
+
+    } catch (error) {
+
+        status.innerText =
+            "Error: " + error.message;
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
